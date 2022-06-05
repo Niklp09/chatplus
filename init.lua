@@ -212,8 +212,6 @@ minetest.register_chatcommand("m", {
 
 minetest.unregister_chatcommand("msg")
 minetest.register_chatcommand("msg", {func = private_message})
-minetest.register_chatcommand("priv", {func = private_message})
-
 
 minetest.register_on_leaveplayer(
 	function(ObjectRef, timed_out)
