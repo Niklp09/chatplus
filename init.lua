@@ -95,6 +95,7 @@ minetest.register_on_chat_message(
 )
 
 minetest.register_chatcommand("namecolor", {
+	description = S("Change the color of your name"),
 	func = function(name, param)
 
 		local valid_color = false
@@ -148,6 +149,7 @@ local function private_message(name, param)
 end
 
 minetest.register_chatcommand("m", {
+	description = S("Send a private message to the same person you sent your last message to."),
 	func = function(name, param)
 		if chatplus.last_priv_msg_name[name] == nil then
 			minetest.chat_send_player(name, "Use " .. minetest.colorize(msg_chat_color_name, "/msg") .. " before this command!")
