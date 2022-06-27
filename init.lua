@@ -3,15 +3,11 @@ chatplus.modpath = minetest.get_modpath("chatplus")
 
 chatplus.last_priv_msg_name = {}
 
--- TODO AFK
 -- TODO Remove colors vector (look at register_on_joinplayer)
 -- TODO cleverly generate the color_description_string
 
-
 local storage = minetest.get_mod_storage()
 local moderator_modpath = minetest.get_modpath("moderator") 
-
-
 
 --- MOD CONFIGURATION ---
 local mod_chat_color_text = "#ff5d37"
@@ -19,8 +15,6 @@ local mod_chat_color_name = "#ff3404"
 
 local msg_chat_color_text = "#ffff88"
 local msg_chat_color_name = "#ffff00"
-
-
 
 colors = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"}
 
@@ -89,25 +83,6 @@ local function get_players_by_str(str)
 	return names
 end
 
-
-minetest.register_chatcommand("player", {
-	func = function(name, param)
-		local names = get_players_by_str(param)
-		if names == nil then
-			minetest.chat_send_player(name, "No players found!")
-		else
-			local msg 
-			if type(names) == "string" then
-				minetest.chat_send_player(name, "Player: " .. names)
-			else
-				minetest.chat_send_player(name, "Players: " .. table.concat(names, ", "))
-			end
-			
-		end
-	end
-})
-
-
 function escape_colors_message(message)
 	local ret_message = message
 	for k, v in pairs(color_escapes_table) do
@@ -116,29 +91,13 @@ function escape_colors_message(message)
 	return ret_message
 end
 
-
-
 minetest.register_on_chat_message(
 	function(name, message)
-	
-		-- ModChat if moderator mod exists
-		if moderator_modpath ~= nil and message:sub(1,1) == "#" then
-			local to_mods_msg =  minetest.get_color_escape_sequence(mod_chat_color_name) .. name .. " to mods: " .. minetest.get_color_escape_sequence(mod_chat_color_text) .. message:sub(2)
-			moderator.chat_send_moderators( to_mods_msg )
-			if not minetest.check_player_privs(name, { moderate=true }) then
-				minetest.chat_send_player( name, to_mods_msg )
-			end
-			return true
-		end
-		
 		minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. escape_colors_message(message))
 		discord.send(('**%s**: %s'):format(name, message))
 		return true
-		
 	end
 )
-
-
 
 minetest.register_chatcommand("namecolor", {
 	func = function(name, param)
@@ -163,8 +122,6 @@ minetest.register_chatcommand("namecolor", {
 	end
 })
 
-
-
 minetest.register_on_joinplayer(
 	function(ObjectRef, last_login)
 
@@ -176,7 +133,6 @@ minetest.register_on_joinplayer(
 
 	end
 )
-
 
 local function private_message(name, param)
 		local to, msg = string.match(param, "([%a%d_-]+) (.+)")
@@ -196,7 +152,6 @@ local function private_message(name, param)
 		end
 end
 
-
 minetest.register_chatcommand("m", {
 	func = function(name, param)
 		if chatplus.last_priv_msg_name[name] == nil then
@@ -208,7 +163,6 @@ minetest.register_chatcommand("m", {
 		end
 	end
 })
-
 
 minetest.unregister_chatcommand("msg")
 minetest.register_chatcommand("msg", {func = private_message})
