@@ -1,13 +1,9 @@
 chatplus = {}
 chatplus.modpath = minetest.get_modpath("chatplus")
-
 chatplus.last_priv_msg_name = {}
 
--- TODO Remove colors vector (look at register_on_joinplayer)
--- TODO cleverly generate the color_description_string
-
+local S = minetest.get_translator("chatplus")
 local storage = minetest.get_mod_storage()
-local moderator_modpath = minetest.get_modpath("moderator") 
 
 --- MOD CONFIGURATION ---
 local mod_chat_color_text = "#ff5d37"
@@ -59,7 +55,6 @@ color_description_string = "Colors: " ..
 	minetest.colorize(color_table["e"], "e ") ..
 	minetest.colorize(color_table["f"], "f")
 
-
 local function get_players_by_str(str)
 	if minetest.get_player_by_name(str) ~= nil then
 		return str
@@ -94,7 +89,7 @@ end
 minetest.register_on_chat_message(
 	function(name, message)
 		minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. escape_colors_message(message))
-		discord.send(('**%s**: %s'):format(name, message))
+		--discord.send(('**%s**: %s'):format(name, message))
 		return true
 	end
 )
@@ -113,7 +108,7 @@ minetest.register_chatcommand("namecolor", {
 
 		if valid_color then
 			storage:set_string(name, param)
-			minetest.chat_send_player(name, "Color of your name changed. (" .. minetest.colorize(color_table[storage:get_string(name)], name) .. ")")
+			minetest.chat_send_player(name, S("Color of your name changed. (").. minetest.colorize(color_table[storage:get_string(name)], name) .. ")")
 		else
 			minetest.chat_send_player(name, "Usage: " .. minetest.colorize("#00ff00", "/namecolor ") .. minetest.colorize("#ffff00", "<color>") )
 			minetest.chat_send_player(name, color_description_string )
@@ -135,21 +130,21 @@ minetest.register_on_joinplayer(
 )
 
 local function private_message(name, param)
-		local to, msg = string.match(param, "([%a%d_-]+) (.+)")
-		if to == nil or msg == nil then
-			minetest.chat_send_player(name, "Usage: " .. minetest.colorize("#00ff00", "/msg ") .. minetest.colorize("#ffff00", "<name> <message>") )
+	local to, msg = string.match(param, "([%a%d_-]+) (.+)")
+	if to == nil or msg == nil then
+		minetest.chat_send_player(name, "Usage: " .. minetest.colorize("#00ff00", "/msg ") .. minetest.colorize("#ffff00", "<name> <message>") )
+	else
+		local names = get_players_by_str(to)
+		if type(names) == "string" then
+			minetest.chat_send_player(name, minetest.colorize(msg_chat_color_name, S("To ") .. names .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
+			minetest.chat_send_player(names, minetest.colorize(msg_chat_color_name, S("From ") .. name .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
+			chatplus.last_priv_msg_name[name] = names
+		elseif names == nil then
+			minetest.chat_send_player(name, "Player " .. minetest.colorize(msg_chat_color_name, to) .. " isn't online.")
 		else
-			local names = get_players_by_str(to)
-			if type(names) == "string" then
-				minetest.chat_send_player(name, minetest.colorize(msg_chat_color_name, "To " .. names .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
-				minetest.chat_send_player(names, minetest.colorize(msg_chat_color_name, "From " .. name .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
-				chatplus.last_priv_msg_name[name] = names
-			elseif names == nil then
-				minetest.chat_send_player(name, "Player " .. minetest.colorize(msg_chat_color_name, to) .. " isn't online.")
-			else
-				minetest.chat_send_player(name, "No message send!  Multiple players could be meant: " .. minetest.colorize(msg_chat_color_name, table.concat(names, ", ")))
-			end
+			minetest.chat_send_player(name, "No message send!  Multiple players could be meant: " .. minetest.colorize(msg_chat_color_name, table.concat(names, ", ")))
 		end
+	end
 end
 
 minetest.register_chatcommand("m", {
