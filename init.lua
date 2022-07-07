@@ -89,7 +89,7 @@ end
 minetest.register_on_chat_message(
 	function(name, message)
 		minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. escape_colors_message(message))
-		--discord.send(('**%s**: %s'):format(name, message))
+		discord.send(('**%s**: %s'):format(name, message))
 		return true
 	end
 )
@@ -139,6 +139,7 @@ local function private_message(name, param)
 		if type(names) == "string" then
 			minetest.chat_send_player(name, minetest.colorize(msg_chat_color_name, S("To ") .. names .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
 			minetest.chat_send_player(names, minetest.colorize(msg_chat_color_name, S("From ") .. name .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
+			minetest.sound_play("chatplus_incoming_msg", {to_player = names})
 			chatplus.last_priv_msg_name[name] = names
 		elseif names == nil then
 			minetest.chat_send_player(name, "Player " .. minetest.colorize(msg_chat_color_name, to) .. " isn't online.")
