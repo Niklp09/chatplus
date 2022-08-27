@@ -86,13 +86,22 @@ function escape_colors_message(message)
 	return ret_message
 end
 
-minetest.register_on_chat_message(
-	function(name, message)
-		minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. escape_colors_message(message))
-		discord.send(('**%s**: %s'):format(name, message))
-		return true
-	end
-)
+if minetest.get_modpath("chatplus_discord") then
+	minetest.register_on_chat_message(
+		function(name, message)
+			minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. escape_colors_message(message))
+			discord.send(('**%s**: %s'):format(name, message))
+			return true
+		end
+	)
+else
+	minetest.register_on_chat_message(
+		function(name, message)
+			minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. escape_colors_message(message))
+			return true
+		end
+	)
+end
 
 minetest.register_chatcommand("namecolor", {
 	description = S("Change the color of your name"),
