@@ -12,7 +12,7 @@ local mod_chat_color_name = "#ff3404"
 local msg_chat_color_text = "#ffff88"
 local msg_chat_color_name = "#ffff00"
 
-colors = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"}
+colors = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e"}
 
 color_table = {}
 color_table["0"] = "#000000" -- Black
@@ -30,7 +30,6 @@ color_table["b"] = "#55ffff" -- Aqua
 color_table["c"] = "#ff5555" -- Red
 color_table["d"] = "#ff55ff" -- Light Purple
 color_table["e"] = "#ffff55" -- Yellow
-color_table["f"] = "#ffffff" -- White
 
 color_escapes_table = {}
 for k, v in pairs(color_table) do
@@ -53,7 +52,6 @@ color_description_string = "Colors: " ..
 	minetest.colorize(color_table["c"], "c ") ..
 	minetest.colorize(color_table["d"], "d ") ..
 	minetest.colorize(color_table["e"], "e ") ..
-	minetest.colorize(color_table["f"], "f")
 
 local function get_players_by_str(str)
 	if minetest.get_player_by_name(str) ~= nil then
