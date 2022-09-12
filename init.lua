@@ -51,7 +51,7 @@ color_description_string = "Colors: " ..
 	minetest.colorize(color_table["b"], "b ") ..
 	minetest.colorize(color_table["c"], "c ") ..
 	minetest.colorize(color_table["d"], "d ") ..
-	minetest.colorize(color_table["e"], "e ") ..
+	minetest.colorize(color_table["e"], "e ")
 
 local function get_players_by_str(str)
 	if minetest.get_player_by_name(str) ~= nil then
