@@ -87,16 +87,24 @@ end
 if minetest.get_modpath("chatplus_discord") then
 	minetest.register_on_chat_message(
 		function(name, message)
-			minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. escape_colors_message(message))
-			discord.send(('**%s**: %s'):format(name, message))
-			return true
+			if minetest.check_player_privs(name, "shout") == true then
+				minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. escape_colors_message(message))
+				discord.send(('**%s**: %s'):format(name, message))
+				return true
+			else
+				return false
+			end
 		end
 	)
 else
 	minetest.register_on_chat_message(
 		function(name, message)
-			minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. escape_colors_message(message))
-			return true
+			if minetest.check_player_privs(name, "shout") == true then
+				minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. escape_colors_message(message))
+				return true
+			else
+				return false
+			end
 		end
 	)
 end
