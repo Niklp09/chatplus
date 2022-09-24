@@ -139,7 +139,7 @@ minetest.register_on_joinplayer(
 		local name = ObjectRef:get_player_name()
 
 		if not storage:contains(name) then
-			storage:set_string(name, colors[math.random(1, 16)])
+			storage:set_string(name, colors[math.random(1, 15)])
 		end
 
 	end
