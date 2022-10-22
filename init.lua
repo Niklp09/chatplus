@@ -1,6 +1,4 @@
-chatplus = {}
-chatplus.modpath = minetest.get_modpath("chatplus")
-chatplus.last_priv_msg_name = {}
+last_priv_msg_name = {}
 
 local S = minetest.get_translator("chatplus")
 local storage = minetest.get_mod_storage()
@@ -125,17 +123,13 @@ minetest.register_chatcommand("namecolor", {
 	end
 })
 
-minetest.register_on_joinplayer(
-	function(ObjectRef, last_login)
+minetest.register_on_joinplayer(function(player)
+	local name = player:get_player_name()
 
-		local name = ObjectRef:get_player_name()
-
-		if not storage:contains(name) then
-			storage:set_string(name, colors[math.random(1, 15)])
-		end
-
+	if not storage:contains(name) then
+		storage:set_string(name, colors[math.random(1, 15)])
 	end
-)
+end)
 
 local function private_message(name, param)
 	local to, msg = string.match(param, "([%a%d_-]+) (.+)")
@@ -147,7 +141,7 @@ local function private_message(name, param)
 			minetest.chat_send_player(name, minetest.colorize(msg_chat_color_name, S("To ") .. names .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
 			minetest.chat_send_player(names, minetest.colorize(msg_chat_color_name, S("From ") .. name .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
 			minetest.sound_play("chatplus_incoming_msg", {to_player = names})
-			chatplus.last_priv_msg_name[name] = names
+			last_priv_msg_name[name] = names
 		elseif names == nil then
 			minetest.chat_send_player(name, "Player " .. minetest.colorize(msg_chat_color_name, to) .. " isn't online.")
 		else
@@ -159,12 +153,12 @@ end
 minetest.register_chatcommand("m", {
 	description = S("Send a private message to the same person you sent your last message to."),
 	func = function(name, param)
-		if chatplus.last_priv_msg_name[name] == nil then
+		if last_priv_msg_name[name] == nil then
 			minetest.chat_send_player(name, "Use " .. minetest.colorize(msg_chat_color_name, "/msg") .. " before this command!")
-		elseif minetest.get_player_by_name(chatplus.last_priv_msg_name[name]) ~= nil then
-			private_message(name, chatplus.last_priv_msg_name[name] .. " " .. param)
+		elseif minetest.get_player_by_name(last_priv_msg_name[name]) ~= nil then
+			private_message(name, last_priv_msg_name[name] .. " " .. param)
 		else
-			minetest.chat_send_player(name, "Player " .. minetest.colorize(msg_chat_color_name, chatplus.last_priv_msg_name[name]) .. " isn't online anymore." )
+			minetest.chat_send_player(name, "Player " .. minetest.colorize(msg_chat_color_name, last_priv_msg_name[name]) .. " isn't online anymore." )
 		end
 	end
 })
@@ -172,9 +166,7 @@ minetest.register_chatcommand("m", {
 minetest.unregister_chatcommand("msg")
 minetest.register_chatcommand("msg", {func = private_message})
 
-minetest.register_on_leaveplayer(
-	function(ObjectRef, timed_out)
-		local name = ObjectRef:get_player_name()
-		chatplus.last_priv_msg_name[name] = nil
-	end
-)
+minetest.register_on_leaveplayer(function(player)
+	local name = player:get_player_name()
+	last_priv_msg_name[name] = nil
+end)
