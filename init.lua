@@ -1,4 +1,4 @@
-ocal last_priv_msg_name = {}
+local last_priv_msg_name = {}
 
 local S = minetest.get_translator("chatplus")
 local storage = minetest.get_mod_storage()
