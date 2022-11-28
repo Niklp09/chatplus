@@ -1,18 +1,15 @@
-last_priv_msg_name = {}
+ocal last_priv_msg_name = {}
 
 local S = minetest.get_translator("chatplus")
 local storage = minetest.get_mod_storage()
 
 --- MOD CONFIGURATION ---
-local mod_chat_color_text = "#ff5d37"
-local mod_chat_color_name = "#ff3404"
-
 local msg_chat_color_text = "#ffff88"
 local msg_chat_color_name = "#ffff00"
 
-colors = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e"}
+local colors = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e"}
 
-color_table = {}
+local color_table = {}
 color_table["0"] = "#000000" -- Black
 color_table["1"] = "#0000aa" -- Dark Blue
 color_table["2"] = "#00aa00" -- Dark Green
@@ -29,12 +26,7 @@ color_table["c"] = "#ff5555" -- Red
 color_table["d"] = "#ff55ff" -- Light Purple
 color_table["e"] = "#ffff55" -- Yellow
 
-color_escapes_table = {}
-for k, v in pairs(color_table) do
-	color_escapes_table[k] = minetest.get_color_escape_sequence(v)
-end
-
-color_description_string = "Colors: " ..
+local color_description_string = "Colors: " ..
 	minetest.colorize(color_table["0"], "0 ") ..
 	minetest.colorize(color_table["1"], "1 ") ..
 	minetest.colorize(color_table["2"], "2 ") ..
@@ -50,29 +42,6 @@ color_description_string = "Colors: " ..
 	minetest.colorize(color_table["c"], "c ") ..
 	minetest.colorize(color_table["d"], "d ") ..
 	minetest.colorize(color_table["e"], "e ")
-
-local function get_players_by_str(str)
-	if minetest.get_player_by_name(str) ~= nil then
-		return str
-	end
-	local names = {}
-	local count = 0
-	for k , player in pairs(minetest.get_connected_players()) do
-		if player:get_player_name():lower():find(str:lower()) ~= nil then
-			table.insert(names, player:get_player_name())
-			count = count + 1
-		end
-	end
-	if count == 0 then
-		return nil
-	end
-	if count == 1 then
-		for k, player_name in pairs(names) do
-			return player_name
-		end
-	end
-	return names
-end
 
 if minetest.get_modpath("chatplus_discord") then
 	minetest.register_on_chat_message(
@@ -105,7 +74,7 @@ minetest.register_chatcommand("namecolor", {
 
 		local valid_color = false
 
-		for k, v in pairs(color_table) do
+		for k in pairs(color_table) do
 			if param == k then
 				valid_color = true
 				break;
@@ -136,16 +105,13 @@ local function private_message(name, param)
 	if to == nil or msg == nil then
 		minetest.chat_send_player(name, "Usage: " .. minetest.colorize("#00ff00", "/msg ") .. minetest.colorize("#ffff00", "<name> <message>") )
 	else
-		local names = get_players_by_str(to)
-		if type(names) == "string" then
-			minetest.chat_send_player(name, minetest.colorize(msg_chat_color_name, S("To ") .. names .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
-			minetest.chat_send_player(names, minetest.colorize(msg_chat_color_name, S("From ") .. name .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
-			minetest.sound_play("chatplus_incoming_msg", {to_player = names})
-			last_priv_msg_name[name] = names
-		elseif names == nil then
-			minetest.chat_send_player(name, "Player " .. minetest.colorize(msg_chat_color_name, to) .. " isn't online.")
+		if minetest.get_player_by_name(to) then
+			minetest.chat_send_player(name, minetest.colorize(msg_chat_color_name, S("To ") .. to .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
+			minetest.chat_send_player(to, minetest.colorize(msg_chat_color_name, S("From ") .. name .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
+			minetest.sound_play("chatplus_incoming_msg", {to_player = to})
+			last_priv_msg_name[name] = to
 		else
-			minetest.chat_send_player(name, "No message send!  Multiple players could be meant: " .. minetest.colorize(msg_chat_color_name, table.concat(names, ", ")))
+			minetest.chat_send_player(name, "Player " .. minetest.colorize(msg_chat_color_name, to) .. " isn't online.")
 		end
 	end
 end
