@@ -48,6 +48,7 @@ if minetest.get_modpath("chatplus_discord") then
 		function(name, message)
 			if minetest.check_player_privs(name, "shout") == true then
 				minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. message)
+				minetest.log("action", "CHAT: <" .. name .. "> " .. message)
 				discord.send(('**%s**: %s'):format(name, message))
 				return true
 			else
@@ -60,6 +61,7 @@ else
 		function(name, message)
 			if minetest.check_player_privs(name, "shout") == true then
 				minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. message)
+				minetest.log("action", "CHAT: <" .. name .. "> " .. message)
 				return true
 			else
 				return false
@@ -108,6 +110,7 @@ local function private_message(name, param)
 		if minetest.get_player_by_name(to) then
 			minetest.chat_send_player(name, minetest.colorize(msg_chat_color_name, S("To ") .. to .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
 			minetest.chat_send_player(to, minetest.colorize(msg_chat_color_name, S("From ") .. name .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
+			minetest.log("action", "MSG: from <" .. name .. "> to <" .. to .. "> " .. msg)
 			minetest.sound_play("chatplus_incoming_msg", {to_player = to})
 			last_priv_msg_name[name] = to
 		else
