@@ -7,10 +7,9 @@ local storage = minetest.get_mod_storage()
 local msg_chat_color_text = "#ffff88"
 local msg_chat_color_name = "#ffff00"
 
-local colors = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e"}
+local colors = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e"}
 
 local color_table = {}
-color_table["0"] = "#000000" -- Black
 color_table["1"] = "#0000aa" -- Dark Blue
 color_table["2"] = "#00aa00" -- Dark Green
 color_table["3"] = "#00aaaa" -- Dark Aqua
@@ -27,7 +26,6 @@ color_table["d"] = "#ff55ff" -- Light Purple
 color_table["e"] = "#ffff55" -- Yellow
 
 local color_description_string = "Colors: " ..
-	minetest.colorize(color_table["0"], "0 ") ..
 	minetest.colorize(color_table["1"], "1 ") ..
 	minetest.colorize(color_table["2"], "2 ") ..
 	minetest.colorize(color_table["3"], "3 ") ..
@@ -97,8 +95,8 @@ minetest.register_chatcommand("namecolor", {
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 
-	if not storage:contains(name) then
-		storage:set_string(name, colors[math.random(1, 15)])
+	if not storage:contains(name) or storage:get_string(name) == "0" then
+		storage:set_string(name, colors[math.random(1, 14)])
 	end
 end)
 
