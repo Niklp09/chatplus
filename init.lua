@@ -104,17 +104,18 @@ local function private_message(name, param)
 	local to, msg = string.match(param, "([%a%d_-]+) (.+)")
 	if to == nil or msg == nil then
 		minetest.chat_send_player(name, "Usage: " .. minetest.colorize("#00ff00", "/msg ") .. minetest.colorize("#ffff00", "<name> <message>") )
-	else
-		if minetest.get_player_by_name(to) then
-			minetest.chat_send_player(name, minetest.colorize(msg_chat_color_name, S("To ") .. to .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
-			minetest.chat_send_player(to, minetest.colorize(msg_chat_color_name, S("From ") .. name .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
-			minetest.log("action", "MSG: from <" .. name .. "> to <" .. to .. "> " .. msg)
-			minetest.sound_play("chatplus_incoming_msg", {to_player = to}, true)
-			last_priv_msg_name[name] = to
-		else
-			minetest.chat_send_player(name, "Player " .. minetest.colorize(msg_chat_color_name, to) .. " isn't online.")
-		end
 	end
+	if not minetest.get_player_by_name(to) then
+		minetest.chat_send_player(name, "Player " .. minetest.colorize(msg_chat_color_name, to) .. " isn't online.")
+	end
+	if name == to then
+		minetest.chat_send_player(name, "You can't send yourself a msg.")
+	end
+	minetest.chat_send_player(name, minetest.colorize(msg_chat_color_name, S("To ") .. to .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
+	minetest.chat_send_player(to, minetest.colorize(msg_chat_color_name, S("From ") .. name .. ": ") .. minetest.colorize(msg_chat_color_text, msg) )
+	minetest.log("action", "MSG: from <" .. name .. "> to <" .. to .. "> " .. msg)
+	minetest.sound_play("chatplus_incoming_msg", {to_player = to})
+	last_priv_msg_name[name] = to
 end
 
 minetest.register_chatcommand("m", {
