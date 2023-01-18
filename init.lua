@@ -18,7 +18,6 @@ color_table["5"] = "#aa00aa" -- Dark Purple
 color_table["6"] = "#ffaa00" -- Gold
 color_table["7"] = "#aaaaaa" -- Gray
 color_table["8"] = "#555555" -- Dark Gray
-color_table["9"] = "#5555ff" -- Blue
 color_table["a"] = "#55ff55" -- Green
 color_table["b"] = "#55ffff" -- Aqua
 color_table["c"] = "#ff5555" -- Red
@@ -34,7 +33,6 @@ local color_description_string = "Colors: " ..
 	minetest.colorize(color_table["6"], "6 ") ..
 	minetest.colorize(color_table["7"], "7 ") ..
 	minetest.colorize(color_table["8"], "8 ") ..
-	minetest.colorize(color_table["9"], "9 ") ..
 	minetest.colorize(color_table["a"], "a ") ..
 	minetest.colorize(color_table["b"], "b ") ..
 	minetest.colorize(color_table["c"], "c ") ..
@@ -95,8 +93,8 @@ minetest.register_chatcommand("namecolor", {
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 
-	if not storage:contains(name) or storage:get_string(name) == "0" then
-		storage:set_string(name, colors[math.random(1, 14)])
+	if not storage:contains(name) or storage:get_string(name) == "0" or storage:get_string(name) == "9" then
+		storage:set_string(name, colors[math.random(1, 13)])
 	end
 end)
 
