@@ -2,6 +2,7 @@ local last_priv_msg_name = {}
 
 local S = minetest.get_translator("chatplus")
 local storage = minetest.get_mod_storage()
+local has_playerdate = minetest.get_modpath("archtec_playerdata")
 
 --- MOD CONFIGURATION ---
 local msg_chat_color_text = "#ffff88"
@@ -46,6 +47,9 @@ if minetest.get_modpath("chatplus_discord") then
 				minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. message)
 				minetest.log("action", "CHAT: <" .. name .. "> " .. message)
 				discord.send(('**%s**: %s'):format(name, message))
+				if has_playerdate then
+					archtec_playerdata.mod(name, "chatmessages", 1)
+				end
 				return true
 			else
 				return false
@@ -58,6 +62,9 @@ else
 			if minetest.check_player_privs(name, "shout") == true then
 				minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. message)
 				minetest.log("action", "CHAT: <" .. name .. "> " .. message)
+				if has_playerdate then
+					archtec_playerdata.mod(name, "chatmessages", 1)
+				end
 				return true
 			else
 				return false
