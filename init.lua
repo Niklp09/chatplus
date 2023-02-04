@@ -8,7 +8,7 @@ local has_playerdate = minetest.get_modpath("archtec_playerdata")
 local msg_chat_color_text = "#ffff88"
 local msg_chat_color_name = "#ffff00"
 
-local colors = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e"}
+local colors = {"1", "2", "3", "4", "5", "6", "7", "8", "a", "b", "c", "d", "e"}
 
 local color_table = {}
 color_table["1"] = "#0000aa" -- Dark Blue
