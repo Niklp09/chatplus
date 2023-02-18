@@ -40,38 +40,21 @@ local color_description_string = "Colors: " ..
 	minetest.colorize(color_table["d"], "d ") ..
 	minetest.colorize(color_table["e"], "e ")
 
-if minetest.get_modpath("chatplus_discord") then
-	minetest.register_on_chat_message(
-		function(name, message)
-			if minetest.check_player_privs(name, "shout") == true then
-				minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. message)
-				minetest.log("action", "CHAT: <" .. name .. "> " .. message)
-				discord.send(('**%s**: %s'):format(name, message))
-				if has_playerdate then
-					archtec_playerdata.mod(name, "chatmessages", 1)
-				end
-				return true
-			else
-				return false
+minetest.register_on_chat_message(
+	function(name, message)
+		if minetest.check_player_privs(name, "shout") == true then
+			minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. message)
+			minetest.log("action", "CHAT: <" .. name .. "> " .. message)
+			discord.send(('**%s**: '):format(name), message)
+			if has_playerdate then
+				archtec_playerdata.mod(name, "chatmessages", 1)
 			end
+			return true
+		else
+			return false
 		end
-	)
-else
-	minetest.register_on_chat_message(
-		function(name, message)
-			if minetest.check_player_privs(name, "shout") == true then
-				minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. message)
-				minetest.log("action", "CHAT: <" .. name .. "> " .. message)
-				if has_playerdate then
-					archtec_playerdata.mod(name, "chatmessages", 1)
-				end
-				return true
-			else
-				return false
-			end
-		end
-	)
-end
+	end
+)
 
 minetest.register_chatcommand("namecolor", {
 	description = S("Change the color of your name"),
