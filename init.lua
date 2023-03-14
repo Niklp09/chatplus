@@ -1,8 +1,9 @@
-local last_priv_msg_name = {}
-
 local S = minetest.get_translator("chatplus")
 local storage = minetest.get_mod_storage()
-local has_playerdate = minetest.get_modpath("archtec_playerdata")
+local has_playerdata = minetest.get_modpath("archtec_playerdata")
+
+local color_cache = {}
+local last_priv_msg_name = {}
 
 --- MOD CONFIGURATION ---
 local msg_chat_color_text = "#ffff88"
@@ -40,20 +41,55 @@ local color_description_string = "Colors: " ..
 	minetest.colorize(color_table["d"], "d ") ..
 	minetest.colorize(color_table["e"], "e ")
 
-minetest.register_on_chat_message(
-	function(name, message)
-		if minetest.check_player_privs(name, "shout") == true then
-			minetest.chat_send_all(minetest.colorize(color_table[storage:get_string(name)], name .. ": ") .. message)
-			minetest.log("action", "CHAT: <" .. name .. "> " .. message)
-			discord.send(('**%s**: '):format(name), message)
-			if has_playerdate then
-				archtec_playerdata.mod(name, "chatmessages", 1)
-			end
-			return true
-		else
-			return false
-		end
+local function get_color(name)
+	if color_cache[name] ~= nil then
+		return color_cache[name]
 	end
+	local color
+	local player = minetest.get_player_by_name(name)
+	local meta = player:get_meta()
+	-- load color
+	if storage:contains(name) then
+		color = storage:get_string(name)
+		storage:set_string(name, "") -- remove old key
+		meta:set_string("chatplus:namecolor", color)
+	elseif meta:contains("chatplus:namecolor") then
+		color = meta:get_string("chatplus:namecolor")
+	end
+	-- choose random color if stored was removed
+	if color == "0" or color == "9" then
+		color = colors[math.random(1, 13)]
+		meta:set_string("chatplus:namecolor", color)
+	end
+	-- new player
+	if not color then
+		color = colors[math.random(1, 13)]
+		meta:set_string("chatplus:namecolor", color)
+	end
+	color_cache[name] = color
+	return color
+end
+
+local function set_color(name, color)
+	local player = minetest.get_player_by_name(name)
+	local meta = player:get_meta()
+	meta:set_string("chatplus:namecolor", color)
+	color_cache[name] = color
+end
+
+minetest.register_on_chat_message(function(name, message)
+	if minetest.check_player_privs(name, "shout") == true then
+		minetest.chat_send_all(minetest.colorize(color_table[get_color(name)], name .. ": ") .. message)
+		minetest.log("action", "CHAT: <" .. name .. "> " .. message)
+		discord.send(('**%s**: '):format(name), message)
+		if has_playerdata then
+			archtec_playerdata.mod(name, "chatmessages", 1)
+		end
+		return true
+	else
+		return false
+	end
+end
 )
 
 minetest.register_chatcommand("namecolor", {
@@ -70,8 +106,8 @@ minetest.register_chatcommand("namecolor", {
 		end
 
 		if valid_color then
-			storage:set_string(name, param)
-			minetest.chat_send_player(name, S("Color of your name changed. (").. minetest.colorize(color_table[storage:get_string(name)], name) .. ")")
+			set_color(name, param)
+			minetest.chat_send_player(name, S("Color of your name changed. (").. minetest.colorize(color_table[get_color(name)], name) .. ")")
 		else
 			minetest.chat_send_player(name, "Usage: " .. minetest.colorize("#00ff00", "/namecolor ") .. minetest.colorize("#ffff00", "<color>") )
 			minetest.chat_send_player(name, color_description_string )
@@ -82,10 +118,7 @@ minetest.register_chatcommand("namecolor", {
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
-
-	if not storage:contains(name) or storage:get_string(name) == "0" or storage:get_string(name) == "9" then
-		storage:set_string(name, colors[math.random(1, 13)])
-	end
+	get_color(name)
 end)
 
 local function private_message(name, param)
@@ -128,4 +161,5 @@ minetest.register_chatcommand("msg", {func = private_message})
 minetest.register_on_leaveplayer(function(player)
 	local name = player:get_player_name()
 	last_priv_msg_name[name] = nil
+	color_cache[name] = nil
 end)
