@@ -49,12 +49,12 @@ local function get_color(name)
 	local player = minetest.get_player_by_name(name)
 	local meta = player:get_meta()
 	-- load color
-	if storage:contains(name) then
+	if meta:contains("chatplus:namecolor") then
+		color = meta:get_string("chatplus:namecolor")
+	elseif storage:contains(name) then
 		color = storage:get_string(name)
 		storage:set_string(name, "") -- remove old key
 		meta:set_string("chatplus:namecolor", color)
-	elseif meta:contains("chatplus:namecolor") then
-		color = meta:get_string("chatplus:namecolor")
 	end
 	-- choose random color if stored was removed
 	if color == "0" or color == "9" then
